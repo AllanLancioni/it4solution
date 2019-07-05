@@ -1,0 +1,36 @@
+<div class="container">
+  <h1>{{form.controls.id.value ? 'Update' : 'Create'}} Post</h1>
+  <hr>
+
+  <form [formGroup]="form">
+    <div class="form-group">
+      <label for="title">Post title</label>
+      <input id="title" type="text" class="form-control" placeholder="Ex: My Post" formControlName="title"
+             [class.is-valid]="form.controls.title.valid" [class.is-invalid]="form.controls.title.invalid && form.controls.title.dirty">
+      <div [class.text-error]="form.controls.title.invalid" class="text-right">{{form.controls.title.value.length}}/{{maxTitleSize}}</div>
+    </div>
+    <div class="form-group">
+      <label for="description">Post description</label>
+      <textarea id="description" placeholder="Ex: My description" class="form-control" rows="3" formControlName="description"
+                [class.is-valid]="form.controls.description.valid" [class.is-invalid]="form.controls.description.invalid && form.controls.description.dirty"></textarea>
+      <div [class.text-error]="form.controls.description.invalid" class="text-right">{{form.controls.description.value.length}}/{{maxDescriptionSize}}</div>
+      <div class="progressbar">
+        <div [ngStyle]="{ width: descriptionSize + '%', background: form.controls.description.invalid ? 'red': 'green' }"></div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="tags">Tags</label>
+      <input id="tags" placeholder="Ex: MyTag" class="form-control" (keyup)="changeTag($event)">
+      <div class="tags-container" style="padding: 15px 0">
+        <div class="tag" *ngFor="let tag of form.value.tags">
+          {{ tag }}
+          <button class="close">
+            <span aria-hidden="true" (click)="removeTag(tag)">&times;</span>
+          </button>
+        </div>
+      </div>
+    </div>
+    <button type="button" class="btn btn-primary" (click)="submit()" [disabled]="form.invalid">Submit</button>
+  </form>
+
+</div>

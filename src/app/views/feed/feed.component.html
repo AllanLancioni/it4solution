@@ -1,0 +1,52 @@
+<div class="container">
+
+  <div style="margin: 20px 0">
+    <div class="input-group">
+      <input type="text" class="form-control" placeholder="Search posts by title, description or tags" [(ngModel)]="filter">
+      <div class="input-group-append">
+        <button class="btn btn-outline-secondary" type="button" [disabled]="!filter" (click)="search()">Search</button>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="filteringBy">
+    <span>Filtering by: {{filteringBy}} <a class="btn btn-outline-secondary btn-sm" (click)="clearFilter()">Clear filter</a></span>
+
+  </div>
+
+  <div *ngIf="!posts.length">
+    No posts to show...
+  </div>
+
+  <div *ngIf="posts.length" class="text-right">{{posts.length}} posts</div>
+
+  <div class="post" *ngFor="let post of posts">
+    <div class="options" *ngIf="post.user.id == user.id">
+      <div class="btn-group" dropdown>
+        <button id="button-basic" dropdownToggle type="button" class="btn dropdown-toggle" aria-controls="dropdown-basic">
+          <span class="caret"></span>
+        </button>
+        <ul id="dropdown-basic" *dropdownMenu class="dropdown-menu" role="menu" aria-labelledby="button-basic">
+          <li role="menuitem"><a class="dropdown-item" (click)="edit(post)">Edit</a></li>
+          <li role="menuitem"><a class="dropdown-item" (click)="delete(post)">Delete</a></li>
+        </ul>
+      </div>
+    </div>
+    <h3>{{post.title}}</h3>
+    <p>{{post.description}}</p>
+    <div *ngIf="post.tags.length" class="tags-container">
+      <div class="tag" *ngFor="let tag of post.tags"><b>#</b>{{tag}}</div>
+    </div>
+    <hr>
+    <span>Posted by: {{ post.user.user }} </span> at <span>{{ post.createDate | date: 'dd/MM/yyyy HH:mm' }}</span>
+    <div class="likes">
+      <button class="btn btn-outline-success" (click)="like(0, post.id)" [tooltip]="userLikes(post)">
+        {{post.likes.length}} <img src="./assets/img/like.png" width="20" alt="Like">
+      </button>
+      <button class="btn btn-outline-danger" (click)="like(1, post.id)" [tooltip]="userUnlikes(post)">
+        {{post.unlikes.length}} <img src="./assets/img/unlike.png" width="20" alt="Unlike">
+      </button>
+    </div>
+  </div>
+
+</div>

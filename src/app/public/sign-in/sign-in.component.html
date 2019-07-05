@@ -1,0 +1,42 @@
+<div class="container-fluid sign-in-page">
+
+  <h1>IT4 Solution</h1>
+
+  <div class="row sign-in">
+    <section class="col">
+      <div class="form-section">
+        <h3>Login</h3>
+        <div class="input-group">
+          <input class="form-control" type="text" placeholder="User" [(ngModel)]="loginForm.user">
+        </div>
+        <div class="input-group">
+          <input class="form-control" type="password" placeholder="Password" [(ngModel)]="loginForm.password">
+        </div>
+        <button class="btn btn-light" (click)="login()">Login</button>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <section class="col">
+      <div class="form-section">
+        <h3>Register</h3>
+        <div class="input-group">
+          <input class="form-control" type="text" placeholder="User" [(ngModel)]="registerForm.user">
+        </div>
+        <div class="input-group">
+          <input class="form-control" type="email" placeholder="Email" [(ngModel)]="registerForm.email">
+        </div>
+        <div class="input-group">
+          <input class="form-control" type="password" placeholder="Password" [(ngModel)]="registerForm.password">
+        </div>
+        <div class="input-group">
+          <input class="form-control" type="password" placeholder="Confirm Password" [(ngModel)]="registerForm.passwordConfirm">
+        </div>
+        <button class="btn btn-light" (click)="register()">Register</button>
+      </div>
+
+    </section>
+  </div>
+
+</div>

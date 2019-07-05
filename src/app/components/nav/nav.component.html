@@ -1,0 +1,18 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <a class="navbar-brand" routerLink="feed">IT4 Solution</a>
+  <div class="collapse navbar-collapse">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item" *ngFor="let item of menuItems">
+        <a class="nav-link" [routerLink]="item.path">{{item.title}}</a>
+      </li>
+    </ul>
+  </div>
+
+  <span style="color: white">{{user.user}}</span>
+  <ul class="navbar-nav mr-auto right" >
+    <li class="nav-item">
+      <a class="nav-link" style="cursor: pointer" (click)="usersService.logout()">Logout</a>
+    </li>
+  </ul>
+
+</nav>  

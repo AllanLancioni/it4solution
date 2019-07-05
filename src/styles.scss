@@ -1,0 +1,22 @@
+/* You can add global styles to this file, and also import other style files */
+.tags-container {
+  .tag {
+    background: white;
+    border-radius: 16px;
+    border: 1px solid #ccc;
+    display: inline-block;
+    padding: 5px 10px;
+    transition: .3s;
+    cursor: default;
+    color: #555;
+    margin: 0 5px 5px 0;
+    .close {
+      font-size: 20px;
+      margin-left: 5px;
+    }
+    &:hover {
+      background: #eee;
+    }
+  }
+}
+
