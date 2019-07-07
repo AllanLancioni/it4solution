@@ -81,13 +81,13 @@ export class FeedComponent implements OnInit {
         case 'ALL':
           return x.title.toLowerCase().includes(this.filter.toLowerCase()) ||
             x.description.toLowerCase().includes(this.filter.toLowerCase()) ||
-            x.tags.some(tag => tag.toLowerCase().includes(this.filter.toLowerCase()));
+            x.tags.some(tag => tag.toLowerCase() === this.filter.toLowerCase());
         case 'TITLE':
           return x.title.toLowerCase().includes(this.filter.toLowerCase());
         case 'DESCRIPTION':
           return x.description.toLowerCase().includes(this.filter.toLowerCase());
         case 'TAGS':
-          return x.tags.some(tag => tag.toLowerCase().includes(this.filter.toLowerCase()));
+          return x.tags.some(tag => tag.toLowerCase() === this.filter.toLowerCase());
       }
 
     });
