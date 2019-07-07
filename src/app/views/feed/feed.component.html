@@ -4,6 +4,11 @@
     <div class="input-group">
       <input type="text" class="form-control" placeholder="Search posts by title, description or tags" [(ngModel)]="filter">
       <div class="input-group-append">
+        <select class="custom-select" style="border-radius: 0" [(ngModel)]="fieldToFilter">
+          <optgroup label="Filter By">
+            <option *ngFor="let opt of fieldToFilterOptions" [value]="opt.value" selected>{{ opt.label }}</option>
+          </optgroup>
+        </select>
         <button class="btn btn-outline-secondary" type="button" [disabled]="!filter" (click)="search()">Search</button>
       </div>
     </div>
@@ -35,7 +40,7 @@
     <h3>{{post.title}}</h3>
     <p>{{post.description}}</p>
     <div *ngIf="post.tags.length" class="tags-container">
-      <div class="tag" *ngFor="let tag of post.tags"><b>#</b>{{tag}}</div>
+      <div class="tag" *ngFor="let tag of post.tags" (click)="filterByTag(tag)" style="cursor: pointer"><b>#</b>{{tag}}</div>
     </div>
     <hr>
     <span>Posted by: {{ post.user.user }} </span> at <span>{{ post.createDate | date: 'dd/MM/yyyy HH:mm' }}</span>

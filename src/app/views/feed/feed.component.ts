@@ -14,6 +14,13 @@ import {NgxUiLoaderService} from 'ngx-ui-loader';
 export class FeedComponent implements OnInit {
 
   filter: string;
+  readonly fieldToFilterOptions = [
+    { label: 'All', value: 'ALL' },
+    { label: 'Title', value: 'TITLE' },
+    { label: 'Description', value: 'DESCRIPTION' },
+    { label: 'Tags', value: 'TAGS' },
+  ];
+  fieldToFilter: string = 'ALL';
   filteringBy: string = null;
   posts: any[] = [];
   user: any = UsersService.loggedInUser;
@@ -69,19 +76,36 @@ export class FeedComponent implements OnInit {
     }
     this.loader.startBackground();
 
-    this.posts = (await this.postsService.getPosts()).filter(x =>
-      x.title.toLowerCase().includes(this.filter.toLowerCase()) ||
-      x.description.toLowerCase().includes(this.filter.toLowerCase()) ||
-      x.tags.some(tag => tag.toLowerCase().includes(this.filter.toLowerCase()))
-    );
+    this.posts = (await this.postsService.getPosts()).filter(x => {
+      switch (this.fieldToFilter) {
+        case 'ALL':
+          return x.title.toLowerCase().includes(this.filter.toLowerCase()) ||
+            x.description.toLowerCase().includes(this.filter.toLowerCase()) ||
+            x.tags.some(tag => tag.toLowerCase().includes(this.filter.toLowerCase()));
+        case 'TITLE':
+          return x.title.toLowerCase().includes(this.filter.toLowerCase());
+        case 'DESCRIPTION':
+          return x.description.toLowerCase().includes(this.filter.toLowerCase());
+        case 'TAGS':
+          return x.tags.some(tag => tag.toLowerCase().includes(this.filter.toLowerCase()));
+      }
+
+    });
     this.filteringBy = this.filter;
-    this.filter = '';
+    // this.filter = '';
     setTimeout(() => this.loader.stopBackground(), 100);
   }
 
   clearFilter() {
     this.getPosts();
     this.filteringBy = null;
+    this.filter = '';
+  }
+
+  filterByTag(tag: string) {
+    this.fieldToFilter = 'TAGS';
+    this.filter = tag;
+    this.search();
   }
 
   userLikes(post) {
