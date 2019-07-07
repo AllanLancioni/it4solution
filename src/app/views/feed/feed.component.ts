@@ -4,6 +4,7 @@ import { UsersService } from '../../services/users.service';
 import {Router} from '@angular/router';
 import Swal from 'sweetalert2';
 import {LikesService} from '../../services/likes.service';
+import {NgxUiLoaderService} from 'ngx-ui-loader';
 
 @Component({
   selector: 'app-feed',
@@ -21,7 +22,8 @@ export class FeedComponent implements OnInit {
     private postsService: PostsService,
     private usersService: UsersService,
     private likesService: LikesService,
-    private router: Router
+    private router: Router,
+    private loader: NgxUiLoaderService
   ) {}
 
   ngOnInit() {
@@ -33,12 +35,14 @@ export class FeedComponent implements OnInit {
   }
 
   async getPosts() {
+    this.loader.startBackground();
     this.posts = await this.postsService.getPosts();
+    setTimeout(() => this.loader.stopBackground(), 100);
   }
 
   async delete(post) {
     try {
-      await Swal.fire('Are you sure?', 'This action is unreversible (until next refresh)!', 'warning');
+      await Swal.fire('Are you sure?', 'This action is unreversible!', 'warning');
       try {
         await this.postsService.deletePost(post.id);
         this.getPosts();
@@ -63,6 +67,8 @@ export class FeedComponent implements OnInit {
     if (!this.filter) {
       return;
     }
+    this.loader.startBackground();
+
     this.posts = (await this.postsService.getPosts()).filter(x =>
       x.title.toLowerCase().includes(this.filter.toLowerCase()) ||
       x.description.toLowerCase().includes(this.filter.toLowerCase()) ||
@@ -70,6 +76,7 @@ export class FeedComponent implements OnInit {
     );
     this.filteringBy = this.filter;
     this.filter = '';
+    setTimeout(() => this.loader.stopBackground(), 100);
   }
 
   clearFilter() {

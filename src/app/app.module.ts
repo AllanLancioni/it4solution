@@ -13,6 +13,7 @@ import { UsersService } from './services/users.service';
 import { BaseComponent } from './views/base/base.component';
 import { BsDropdownModule } from 'ngx-bootstrap';
 import { TooltipModule } from 'ngx-bootstrap';
+import { NgxUiLoaderModule, NgxUiLoaderRouterModule } from 'ngx-ui-loader';
 
 @NgModule({
   declarations: [
@@ -30,6 +31,8 @@ import { TooltipModule } from 'ngx-bootstrap';
     AppRoutingModule,
     TooltipModule.forRoot(),
     BsDropdownModule.forRoot(),
+    NgxUiLoaderModule,
+    NgxUiLoaderRouterModule
   ],
   providers: [AuthGuard, UsersService],
   bootstrap: [AppComponent]
