@@ -32,9 +32,24 @@ export abstract class Database {
 export class DatabaseCollection {
 
   private lastId: number = 0;
+
+  private get getKeyOnSession() {
+    return localStorage.getItem(btoa(this.collectionName)) || null;
+  }
+
+  public get hasKeyOnSession() {
+    return !!this.getKeyOnSession;
+  }
+
   private readonly collection: Data[] = [];
 
-  constructor(private collectionName: string) {}
+  get count(): number {
+    return this.collection.length;
+  }
+
+  constructor(public collectionName: string) {
+    this.loadStorage();
+  }
 
   async get(filter: Data = {}, populates?: PopulateParams[]): Promise<Data[]> {
 
@@ -83,6 +98,7 @@ export class DatabaseCollection {
     data.updateDate = new Date();
     data.id = ++this.lastId;
     this.collection.push(data);
+    this.updateStorage();
     return this.getById(this.lastId);
   }
 
@@ -97,6 +113,7 @@ export class DatabaseCollection {
         return rej();
       }
       this.collection.splice(foundIndex, 1);
+      this.updateStorage();
       return res();
     });
   }
@@ -116,6 +133,7 @@ export class DatabaseCollection {
       } else {
         Object.keys(data).forEach(key => this.collection[foundIndex][key] = data[key]);
       }
+      this.updateStorage();
       this.getById(id)
         .then((x: Data) => res(x))
         .catch(() => rej());
@@ -128,6 +146,18 @@ export class DatabaseCollection {
       return this.update(dataFound.id, data, patchValues);
     }
     return this.insert({...data, ...query});
+  }
+
+  private loadStorage(): void {
+    const items = this.getKeyOnSession;
+    if (!items) {
+      return;
+    }
+    this.collection.splice(0, this.collection.length, ...JSON.parse(atob(items)));
+  }
+
+  private updateStorage(): void {
+    localStorage.setItem(btoa(this.collectionName), btoa(JSON.stringify(this.collection)));
   }
 
 }

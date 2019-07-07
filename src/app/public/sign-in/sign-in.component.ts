@@ -25,6 +25,7 @@ export class SignInComponent implements OnInit {
   constructor(private usersService: UsersService, private router: Router) { }
 
   ngOnInit() {
+    this.usersService.logout();
   }
 
   async login() {

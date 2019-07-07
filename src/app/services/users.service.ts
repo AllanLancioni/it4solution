@@ -9,18 +9,21 @@ import Swal from 'sweetalert2';
 export class UsersService {
 
   static loggedInUser = null;
+  static readonly storageKey: string = 'loggedUser';
 
-  constructor(private router: Router) {
-    // Start app logged in
-    setTimeout(() => this.login({user: 'admin', password: '123'}).then(() => this.router.navigateByUrl('feed')), 2000);
-  }
+  constructor(private router: Router) {}
 
   async login(form): Promise<void> {
 
     try {
       const [userFound] = await usersCollection.get({user: form.user, password: form.password});
       UsersService.loggedInUser = userFound || null;
-      return Promise.resolve();
+      if (userFound) {
+        console.log(userFound);
+        localStorage.setItem(btoa(UsersService.storageKey), btoa(JSON.stringify(userFound)));
+        return Promise.resolve();
+      }
+      return Promise.reject();
     } catch (err) {
       return Promise.reject();
     }
@@ -50,7 +53,13 @@ export class UsersService {
 
   logout() {
     UsersService.loggedInUser = null;
+    localStorage.setItem(btoa(UsersService.storageKey), '');
     this.router.navigateByUrl('sign-in');
   }
 
+}
+
+// Load user from session
+if (!UsersService.loggedInUser) {
+  UsersService.loggedInUser = (str => str ? JSON.parse(atob(str)) : null)(localStorage.getItem(btoa(UsersService.storageKey)));
 }
