@@ -154,6 +154,7 @@ export class DatabaseCollection {
       return;
     }
     this.collection.splice(0, this.collection.length, ...JSON.parse(atob(items)));
+    this.lastId = this.collection.sort((a, b) => a.id < b.id ? 1 : -1)[0].id;
   }
 
   private updateStorage(): void {

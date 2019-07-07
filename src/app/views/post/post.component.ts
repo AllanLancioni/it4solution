@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {ActivatedRoute, Router} from '@angular/router';
 import {PostsService} from '../../services/posts.service';
 import Swal from 'sweetalert2';
+import {UsersService} from '../../services/users.service';
 
 @Component({
   selector: 'app-post',
@@ -23,7 +24,8 @@ export class PostComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private formBuilder: FormBuilder,
-    private postsService: PostsService
+    private postsService: PostsService,
+    private usersService: UsersService,
   ) {}
 
   async ngOnInit() {
@@ -37,10 +39,11 @@ export class PostComponent implements OnInit {
 
     if (this.route.snapshot.params.id) {
       const foundPost = await this.postsService.getPostById(+this.route.snapshot.params.id);
-      if (foundPost) {
+      if (foundPost && foundPost.userId === UsersService.loggedInUser.id) {
         this.form.patchValue(foundPost);
       } else {
-        Swal.fire('Error 404', `Can not found post with id ${this.route.snapshot.params.id}`, 'error');
+        Swal.fire('Error 404', `Can not found your post with id ${this.route.snapshot.params.id}`, 'error');
+        this.router.navigateByUrl('/feed');
       }
     }
   }

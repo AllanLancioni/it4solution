@@ -10,3 +10,11 @@
   height: 20px;
   border-radius: 10px;
 }
+
+.control-buttons {
+  text-align: right;
+  margin: 10px 0;
+  & > .btn {
+    margin-left: 10px;
+  }
+}

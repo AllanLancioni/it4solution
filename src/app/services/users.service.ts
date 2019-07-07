@@ -19,7 +19,6 @@ export class UsersService {
       const [userFound] = await usersCollection.get({user: form.user, password: form.password});
       UsersService.loggedInUser = userFound || null;
       if (userFound) {
-        console.log(userFound);
         localStorage.setItem(btoa(UsersService.storageKey), btoa(JSON.stringify(userFound)));
         return Promise.resolve();
       }

@@ -30,7 +30,11 @@
         </div>
       </div>
     </div>
-    <button type="button" class="btn btn-primary" (click)="submit()" [disabled]="form.invalid">Submit</button>
+
+    <div class="control-buttons">
+      <button type="button" class="btn btn-primary" (click)="submit()" [disabled]="form.invalid">Submit</button>
+      <button type="button" class="btn btn-danger" routerLink="/feed">Cancel</button>
+    </div>
   </form>
 
 </div>
