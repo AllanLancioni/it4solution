@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import {UsersService} from '../../services/users.service';
+import Swal from "sweetalert2";
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-sign-in',
@@ -20,17 +22,20 @@ export class SignInComponent implements OnInit {
     passwordConfirm: ''
   };
 
-  constructor(private usersService: UsersService) { }
+  constructor(private usersService: UsersService, private router: Router) { }
 
   ngOnInit() {
   }
 
   async login() {
-    this.usersService.login(this.loginForm);
+    this.usersService.login(this.loginForm)
+      .then(() => this.router.navigateByUrl('feed'))
+      .catch(() => Swal.fire('Error', 'Invalid user or password!', 'error'));
   }
 
   async register() {
-    this.usersService.register(this.registerForm);
+    this.usersService.register(this.registerForm)
+      .then(() => this.router.navigateByUrl('feed'));
   }
 
 }

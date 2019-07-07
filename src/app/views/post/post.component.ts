@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators} from '@angular/forms';
-import {ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {PostsService} from '../../services/posts.service';
 import Swal from 'sweetalert2';
 
@@ -19,26 +19,31 @@ export class PostComponent implements OnInit {
     return Math.min(this.form.controls.description.value.length / this.maxDescriptionSize * 100, 100);
   }
 
-  constructor(private route: ActivatedRoute, private formBuilder: FormBuilder, private postsService: PostsService) {
+  constructor(
+    private router: Router,
+    private route: ActivatedRoute,
+    private formBuilder: FormBuilder,
+    private postsService: PostsService
+  ) {}
 
-    this.form = formBuilder.group({
-      id: [route.snapshot.params.id || null],
+  async ngOnInit() {
+
+    this.form = this.formBuilder.group({
+      id: [this.route.snapshot.params.id ? +this.route.snapshot.params.id : null],
       title: ['', [Validators.required, Validators.maxLength(this.maxTitleSize), Validators.minLength(3)]],
       description:  ['', [Validators.required, Validators.maxLength(this.maxDescriptionSize), Validators.minLength(3)]],
       tags: [[]]
     });
 
-    if (route.snapshot.params.id) {
-      const foundPost = this.postsService.getPostById(parseInt(route.snapshot.params.id, 10));
+    if (this.route.snapshot.params.id) {
+      const foundPost = await this.postsService.getPostById(+this.route.snapshot.params.id);
       if (foundPost) {
         this.form.patchValue(foundPost);
       } else {
-        Swal.fire('Error 404', `Can not found post with id ${route.snapshot.params.id}`, 'error');
+        Swal.fire('Error 404', `Can not found post with id ${this.route.snapshot.params.id}`, 'error');
       }
     }
   }
-
-  ngOnInit() {}
 
   changeTag(e: any) {
     e.target.value = e.target.value.replace(/[\s,]/, '');
@@ -56,17 +61,27 @@ export class PostComponent implements OnInit {
     this.form.controls.tags.value.splice(this.form.controls.tags.value.find(x => x === tag), 1);
   }
 
-  submit() {
+  async submit() {
 
     if (this.form.invalid) {
       Swal.fire('Error', 'Invalid form!', 'error');
       return;
     }
-    if (!this.route.snapshot.params.id) {
-      this.postsService.createPost(this.form.value);
-    } else {
-      this.postsService.updatePost(this.form.value);
+    try {
+      if (!this.route.snapshot.params.id) {
+        await this.postsService.createPost(this.form.value);
+      } else {
+        await this.postsService.updatePost(this.form.value);
+      }
+      this.router.navigateByUrl('feed');
+
+    } catch (err) {
+      Swal.fire({toast: true, type: 'error', text: ' failed!', position: 'bottom-end'});
     }
+
+
+
+
   }
 
 }

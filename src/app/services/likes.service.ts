@@ -1,23 +1,18 @@
 import { Injectable } from '@angular/core';
-import { likes } from '../../database-simulation/likes';
+import { likesCollection } from '../../database-simulation/collections/likes';
+import {Data} from '../../database-simulation/database.class';
 
 @Injectable({
   providedIn: 'root'
 })
 export class LikesService {
 
-  react(type: number, postId: number, userId: number) {
-    const like = likes.collection.find(x => x.userId === userId && x.postId === postId);
-    if (like) {
-      if (like.type === type) {
-        likes.collection.splice(likes.collection.indexOf(like), 1);
-      } else {
-        like.type = type;
-      }
-    } else {
-      likes.lastId++;
-      likes.collection.push({id: likes.lastId, type, userId, postId});
+  async react(type: number, postId: number, userId: number): Promise<Data|void> {
+    const [alreadyLike] = await likesCollection.get({postId, userId, type});
+    if (!alreadyLike) {
+      return likesCollection.updateOrInsert({userId, postId}, {type});
     }
+    return likesCollection.deleteById(alreadyLike.id);
   }
 
   constructor() { }

@@ -17,8 +17,12 @@ export class FeedComponent implements OnInit {
   posts: any[] = [];
   user: any = UsersService.loggedInUser;
 
-  constructor(private postsService: PostsService, private usersService: UsersService, private likesService: LikesService, private router: Router) {
-  }
+  constructor(
+    private postsService: PostsService,
+    private usersService: UsersService,
+    private likesService: LikesService,
+    private router: Router
+  ) {}
 
   ngOnInit() {
     this.getPosts();
@@ -28,18 +32,18 @@ export class FeedComponent implements OnInit {
     this.router.navigateByUrl(`post/${post.id}`);
   }
 
-  getPosts() {
-    this.posts = this.postsService.getPosts();
+  async getPosts() {
+    this.posts = await this.postsService.getPosts();
   }
 
   async delete(post) {
     try {
       await Swal.fire('Are you sure?', 'This action is unreversible (until next refresh)!', 'warning');
-      const deleted = this.postsService.deletePost(post.id);
-      if (deleted) {
-        Swal.fire({toast: true, type: 'success', text: 'Deleted!', position: 'bottom-end'});
+      try {
+        await this.postsService.deletePost(post.id);
         this.getPosts();
-      } else {
+        Swal.fire({toast: true, type: 'success', text: 'Deleted!', position: 'bottom-end'});
+      } catch (e) {
         Swal.fire({toast: true, type: 'error', text: 'Delete failed!', position: 'bottom-end'});
       }
 
@@ -48,16 +52,18 @@ export class FeedComponent implements OnInit {
   }
 
   like(type: number, postId: number) {
-    this.likesService.react(type, postId, this.user.id);
-    this.getPosts();
+    this.likesService.react(type, postId, this.user.id)
+      .then(() => this.getPosts())
+      .catch(() => Swal.fire({toast: true, type: 'error', text: 'Reaction failed!', position: 'bottom-end'}));
+    // this.getPosts();
   }
 
-  search() {
+  async search() {
 
     if (!this.filter) {
       return;
     }
-    this.posts = this.postsService.getPosts().filter(x =>
+    this.posts = (await this.postsService.getPosts()).filter(x =>
       x.title.toLowerCase().includes(this.filter.toLowerCase()) ||
       x.description.toLowerCase().includes(this.filter.toLowerCase()) ||
       x.tags.some(tag => tag.toLowerCase().includes(this.filter.toLowerCase()))

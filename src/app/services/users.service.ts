@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { users } from '../../database-simulation/users';
+import { usersCollection } from '../../database-simulation/collections/users';
 import {Router} from '@angular/router';
 import Swal from 'sweetalert2';
 
@@ -8,45 +8,49 @@ import Swal from 'sweetalert2';
 })
 export class UsersService {
 
-  static loggedInUser = users.collection[0];
-  // static loggedInUser = null;
+  static loggedInUser = null;
 
-  constructor(private route: Router) {}
+  constructor(private router: Router) {
+    // Start app logged in
+    setTimeout(() => this.login({user: 'admin', password: '123'}).then(() => this.router.navigateByUrl('feed')), 2000);
+  }
 
-  login(form) {
-    const userFound = users.collection.find(x => x.user === form.user && x.password === form.password);
-    if (!userFound) {
-      Swal.fire('Error', 'Invalid user or password!', 'error');
-      return;
+  async login(form): Promise<void> {
+
+    try {
+      const [userFound] = await usersCollection.get({user: form.user, password: form.password});
+      UsersService.loggedInUser = userFound || null;
+      return Promise.resolve();
+    } catch (err) {
+      return Promise.reject();
     }
-    UsersService.loggedInUser = userFound;
-    this.route.navigateByUrl('feed');
 
   }
 
-  register(form) {
+  async register(form) {
 
     if (form.password !== form.passwordConfirm) {
       Swal.fire('Error', 'Passwords doesn\'t match!', 'error');
-      return;
+      return Promise.reject();
     }
-
-    const userFound = users.collection.find(x => x.user === form.user || x.email === form.email);
-    if (userFound) {
+    if ((await usersCollection.get()).some(x => x.user === form.user || x.email === form.email)) {
       Swal.fire('Error', 'User with same username or email already registered!', 'error');
-      return;
+      return Promise.reject();
     }
 
-    delete form.confirmPassword;
-    users.lastId++;
-    const user = {...form, id: users.lastId };
-    users.collection.push(user);
-    this.login(user);
+    try {
+      delete form.confirmPassword;
+      await usersCollection.insert(form);
+      return this.login(form);
+    } catch (err) {
+      console.error(err);
+      return Promise.reject();
+    }
   }
 
   logout() {
     UsersService.loggedInUser = null;
-    this.route.navigateByUrl('sign-in');
+    this.router.navigateByUrl('sign-in');
   }
 
 }
